@@ -7,5 +7,5 @@
 #' @examples
 #' hello_function()
 hello_function <- function(text) {
-	print(print(paste("hello", text)))
+	print(paste("hello", text))
 }
