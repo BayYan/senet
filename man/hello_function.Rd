@@ -4,7 +4,10 @@
 \alias{hello_function}
 \title{A Hello Function}
 \usage{
-hello_function()
+hello_function(text)
+}
+\arguments{
+\item{text}{To whom you want to say hello.}
 }
 \description{
 This function allows you to say hello.
