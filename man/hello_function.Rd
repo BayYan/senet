@@ -4,10 +4,10 @@
 \alias{hello_function}
 \title{A Hello Function}
 \usage{
-hello_function(text)
+hello_function(filename)
 }
 \arguments{
-\item{text}{To whom you want to say hello.}
+\item{text_file_path}{file path to the text doc}
 }
 \description{
 This function allows you to say hello.
