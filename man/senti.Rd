@@ -2,26 +2,24 @@
 % Please edit documentation in R/senti.R
 \name{senti}
 \alias{senti}
-\title{SENET package in R
-This package reads text files and generates measures of text sentiments based on shortest path in the semantic network}
+\title{sentiment analysis}
 \usage{
 senti(
-  filename,
-  window_size,
-  useDroplist = TRUE,
-  droplist = system.file("extdata", "droplist.txt", package = "senet")
+  edgelist,
+  target,
+  positiveLexicon = system.file("extdata", "SeedsPos.txt", package = "senet"),
+  negativeLexicon = system.file("extdata", "SeedsNeg.txt", package = "senet")
 )
 }
 \arguments{
-\item{filename}{path to the text file}
+\item{target}{the target keyword string}
 
-\item{window_size}{size of the n-gram}
+\item{positiveLexicon}{the positive keyword string list}
 
-\item{useDroplist}{whether to drop a list of words, default is yes}
+\item{negativeLexicon}{the negative keyword string list}
 
-\item{droplist}{path to the stopword list, if not specified, the built-in stopword list is used}
+\item{graph}{edge graph}
 }
 \description{
-SENET package in R
-This package reads text files and generates measures of text sentiments based on shortest path in the semantic network
+sentiment analysis
 }
