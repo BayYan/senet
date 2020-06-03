@@ -1,6 +1,6 @@
 #' SENET package in R
 #' This package reads text files and generates measures of text sentiments based on shortest path in the semantic network
-#' @param filename path to the text file
+#' @param filename path to the text file in txt format
 #' @param window_size size of the n-gram, defult is 3
 #' @param useDroplist whether to drop a list of words, default is yes
 #' @param droplist path to the stopword list, if not specified, the built-in stopword list is used
@@ -13,7 +13,7 @@ tograph <- function(filename, window_size=3, useDroplist=TRUE, droplist=system.f
   doc <- quanteda::char_tolower(text)
   doc <- gsub("\\w*[0-9]+\\w*\\s*", "",doc)
   doc <- gsub("http.*", "", doc)
-  doc <- gsub("@|#|'|-|:", "", doc)
+  doc <- gsub("@|#|'|-|:", " ", doc)
   doc <- gsub("[^[:alnum:][:blank:]?&/\\-]", "", doc)
   
   #tokenize text

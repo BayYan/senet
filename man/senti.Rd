@@ -12,13 +12,13 @@ senti(
 )
 }
 \arguments{
+\item{edgelist}{edgelist with edges and counts}
+
 \item{target}{the target keyword string}
 
-\item{positiveLexicon}{the positive keyword string list}
+\item{positiveLexicon}{path to the positive sentiment words in txt format, if not specified, the built-in lexicon is used}
 
-\item{negativeLexicon}{the negative keyword string list}
-
-\item{graph}{edge graph}
+\item{negativeLexicon}{path to the negtive sentiment words in txt format, if not specified, the built-in lexicon is used}
 }
 \description{
 sentiment analysis

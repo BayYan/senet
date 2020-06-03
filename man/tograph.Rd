@@ -13,7 +13,7 @@ tograph(
 )
 }
 \arguments{
-\item{filename}{path to the text file}
+\item{filename}{path to the text file in txt format}
 
 \item{window_size}{size of the n-gram, defult is 3}
 
