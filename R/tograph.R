@@ -12,9 +12,10 @@ tograph <- function(filename, window_size=3, useDroplist=TRUE, droplist=system.f
   text <- unique(read.delim(filename, quote="", stringsAsFactor = FALSE,header=F, encoding="UTF-8")$V1)
   doc <- quanteda::char_tolower(text)
   doc <- gsub("\\w*[0-9]+\\w*\\s*", "",doc)
-  doc <- gsub("http.*", "", doc)
-  doc <- gsub("@|#|'|-|:", " ", doc)
-  doc <- gsub("[^[:alnum:][:blank:]?&/\\-]", "", doc)
+  doc <- gsub("http.*", " ", doc)
+  doc <- gsub("@|#|-|:", " ", doc)
+  doc <- gsub("'", "", doc)
+  doc <- gsub("[^[:alnum:][:blank:]?&/\\-]", " ", doc)
   
   #tokenize text
   #remove punctuations, tokenize sentences
