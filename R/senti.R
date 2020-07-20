@@ -72,7 +72,7 @@ senti <- function(
             purePosCount <- purePosCount + 1
 
             if (verbose) {
-                label <- if (targetToPosIsMixed) "Pure_Positive_From_Target_to_Seed" else "Mixed_Positive_From_Target_to_Seed"
+                label <- if (targetToPosIsMixed) "Mixed_Positive_From_Target_to_Seed" else "Pure_Positive_From_Target_to_Seed"
                 message(paste(
                     label,
                     paste("seed word:", positiveWord),
@@ -91,7 +91,7 @@ senti <- function(
             purePosCountRev <- purePosCountRev + 1
 
             if (verbose) {
-                label <- if (targetToPosIsMixed) "Pure_Positive_From_Seed_to_Target" else "Mixed_Positive_From_Seed_to_Target"
+                label <- if (targetToPosIsMixed) "Mixed_Positive_From_Seed_to_Target" else "Pure_Positive_From_Seed_to_Target"
                 message(paste(
                     label,
                     paste("seed word:", positiveWord),
@@ -140,7 +140,7 @@ senti <- function(
             pureNegCount <- pureNegCount + 1
 
             if (verbose) {
-                label <- if (targetToPosIsMixed) "Pure_Negative_From Target_to_Seed" else "Mixed_Negative_From_Target_to_Seed"
+                label <- if (targetToPosIsMixed) "Mixed_Negative_From Target_to_Seed" else "Pure_Negative_From_Target_to_Seed"
                 message(paste(
                     label,
                     paste("seed word:", negativeWords),
@@ -159,7 +159,7 @@ senti <- function(
             pureNegCountRev <- pureNegCountRev + 1
 
             if (verbose) {
-                label <- if (targetToPosIsMixed) "Pure_Negative_From Seed_to_Target" else "Mixed_Negative_From_Seed_to_Target"
+                label <- if (targetToPosIsMixed) "Mixed_Negative_From Seed_to_Target" else "Pure_Negative_From_Seed_to_Target"
                 message(paste(
                     label,
                     paste("seed word:", negativeWord),
