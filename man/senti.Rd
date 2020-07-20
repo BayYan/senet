@@ -8,7 +8,8 @@ senti(
   edgelist,
   target,
   positiveLexicon = system.file("extdata", "SeedsPos.txt", package = "senet"),
-  negativeLexicon = system.file("extdata", "SeedsNeg.txt", package = "senet")
+  negativeLexicon = system.file("extdata", "SeedsNeg.txt", package = "senet"),
+  verbose = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ senti(
 \item{positiveLexicon}{path to the positive sentiment words in txt format, if not specified, the built-in lexicon is used}
 
 \item{negativeLexicon}{path to the negtive sentiment words in txt format, if not specified, the built-in lexicon is used}
+
+\item{verbose}{print messages}
 }
 \description{
 sentiment analysis

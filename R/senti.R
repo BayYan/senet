@@ -3,10 +3,16 @@
 #' @param target the target keyword string
 #' @param positiveLexicon path to the positive sentiment words in txt format, if not specified, the built-in lexicon is used
 #' @param negativeLexicon path to the negtive sentiment words in txt format, if not specified, the built-in lexicon is used
+#' @param verbose print messages
 #' @importFrom igraph graph.data.frame E V all_shortest_paths
 #' @export
 
-senti <- function(edgelist, target, positiveLexicon=system.file("extdata", "SeedsPos.txt", package = "senet"), negativeLexicon=system.file("extdata", "SeedsNeg.txt", package = "senet")) {
+senti <- function(
+    edgelist,
+    target,
+    positiveLexicon=system.file("extdata", "SeedsPos.txt", package = "senet"),
+    negativeLexicon=system.file("extdata", "SeedsNeg.txt", package = "senet"),
+    verbose = FALSE) {
 
     options(warn=-1)
     colnames(edgelist)[3] <- "weight"
@@ -23,43 +29,79 @@ senti <- function(edgelist, target, positiveLexicon=system.file("extdata", "Seed
     positiveWords <- read.delim(positiveLexicon, stringsAsFactor = FALSE,header=F)$V1
     negativeWords <- read.delim(negativeLexicon, stringsAsFactor = FALSE,header=F)$V1
 
-    PurePosCount=0
-    PurePosCountRev=0
-    PureNegCount=0
-    PureNegCountRev=0
-    nonPurePosCount=0
-    nonPurePosCountRev=0
-    nonPureNegCount=0
-    nonPureNegCountRev=0
+    purePosCount = 0
+    purePosCountRev = 0
+    pureNegCount = 0
+    pureNegCountRev = 0
+    mixedPosCount = 0
+    mixedPosCountRev = 0
+    mixedNegCount = 0
+    mixedNegCountRev = 0
 
 
     for (positiveWord in positiveWords) {
         posV <- igraph::V(graph)[name == positiveWord]
 
-        if (length(posV) == 0) {next }
+        if (length(posV) == 0) { next }
         nActualPositive <- nActualPositive + 1
 
-        result <- calculateDistance(graph, targetV, posV, negativeWords)
-        targetToPosMat_weight <- result[1]
-        targetToPosMat_length <- result[2]
-        nonPurePosCount <- nonPurePosCount + result[3]
+        result <- calculateDistance(graph, targetV, posV, negativeWords, verbose)
+        targetToPosPathLength <- as.numeric(result[1])
+        targetToPosEdgeCount <- as.numeric(result[2])
+        targetToPosIsMixed <- as.logical(result[3])
+        targetToPosPathString <- result[4]
 
-        # reverse
-        result <- calculateDistance(graph, posV, targetV, negativeWords)
-        posToTargetMat_weight <- result[1]
-        posToTargetMat_length <- result[2]
-        nonPurePosCountRev <- nonPurePosCountRev + result[3]
-
-        if (targetToPosMat_length != 0) {
-            dist_to <- targetToPosMat_weight / (targetToPosMat_length * targetToPosMat_length)
-            sumPositive <- sumPositive + dist_to
-            PurePosCount <- PurePosCount + 1
+        if (targetToPosIsMixed) {
+            mixedPosCount <- mixedPosCount + 1
         }
 
-        if (posToTargetMat_length != 0) {
-            dist_from <- posToTargetMat_weight / (posToTargetMat_length * posToTargetMat_length)
-            sumPositive <- sumPositive + dist_from
-            PurePosCountRev <- PurePosCountRev + 1
+        # reverse
+        result <- calculateDistance(graph, posV, targetV, negativeWords, verbose)
+        posToTargetPathLength <- as.numeric(result[1])
+        posToTargetEdgeCount <- as.numeric(result[2])
+        posToTargetIsMixed <- as.logical(result[3])
+        posToTargetPathString <- result[4]
+
+        if (posToTargetIsMixed) {
+            mixedPosCountRev <- mixedPosCountRev + 1
+        }
+
+        if (targetToPosEdgeCount != 0) {
+            strengthTo <- targetToPosPathLength / (targetToPosEdgeCount * targetToPosEdgeCount)
+            sumPositive <- sumPositive + strengthTo
+            purePosCount <- purePosCount + 1
+
+            if (verbose) {
+                label <- if (targetToPosIsMixed) "Pure_Positive_From_Target_to_Seed" else "Mixed_Positive_From_Target_to_Seed"
+                message(paste(
+                    label,
+                    paste("seed word:", positiveWord),
+                    paste("target word:", target),
+                    paste("path length:", targetToPosPathLength),
+                    paste("edge count:", targetToPosEdgeCount),
+                    paste("strength ", strengthTo),
+                    paste("path string: [", targetToPosPathString, "]"),
+                    sep = ", "))
+            }
+        }
+
+        if (posToTargetEdgeCount != 0) {
+            strengthFrom <- posToTargetPathLength / (posToTargetEdgeCount * posToTargetEdgeCount)
+            sumPositive <- sumPositive + strengthFrom
+            purePosCountRev <- purePosCountRev + 1
+
+            if (verbose) {
+                label <- if (targetToPosIsMixed) "Pure_Positive_From_Seed_to_Target" else "Mixed_Positive_From_Seed_to_Target"
+                message(paste(
+                    label,
+                    paste("seed word:", positiveWord),
+                    paste("target word:", target),
+                    paste("path length:", posToTargetPathLength),
+                    paste("edge count:", posToTargetEdgeCount),
+                    paste("strength", strengthFrom),
+                    paste("path string: [", posToTargetPathString, "]"),
+                    sep = ", "))
+            }
         }
     }
 
@@ -71,27 +113,63 @@ senti <- function(edgelist, target, positiveLexicon=system.file("extdata", "Seed
         if (length(negV) == 0) { next }
         nActualNegative <- nActualNegative + 1
 
-        result <- calculateDistance(graph, targetV, negV, positiveWords)
-        targetToNegMat_weight <- result[1]
-        targetToNegMat_length <- result[2]
-        nonPureNegCount <- nonPureNegCount + result[3]
+        result <- calculateDistance(graph, targetV, negV, positiveWords, verbose)
+        targetToNegPathLength <- as.numeric(result[1])
+        targetToNegEdgeCount <- as.numeric(result[2])
+        targetToNegIsMixed <- as.logical(result[3])
+        targetToNegPathString <- result[4]
 
-        # reverse
-        result <- calculateDistance(graph, negV, targetV, positiveWords)
-        negToTargetMat_weight <- result[1]
-        negToTargetMat_length <- result[2]
-        nonPureNegCountRev <- nonPureNegCountRev + result[3]
-
-        if (targetToNegMat_length != 0) {
-            dist_to <- targetToNegMat_weight / (targetToNegMat_length * targetToNegMat_length)
-            sumNegative <- sumNegative + dist_to
-            PureNegCount <- PureNegCount + 1
+        if (targetToNegIsMixed) {
+            mixedNegCount <- mixedNegCount + 1
         }
 
-        if (negToTargetMat_length != 0) {
-            dist_from <- negToTargetMat_weight / (negToTargetMat_length * negToTargetMat_length)
-            sumNegative <- sumNegative + dist_from
-            PureNegCountRev <- PureNegCountRev + 1
+        # reverse
+        result <- calculateDistance(graph, negV, targetV, positiveWords, verbose)
+        negToTargetPathLength <- as.numeric(result[1])
+        negToTargetEdgeCount <- as.numeric(result[2])
+        negToTargetIsMixed <- as.logical(result[3])
+        negToTargetPathString <- result[4]
+
+        if (negToTargetIsMixed) {
+            mixedNegCountRev <- mixedNegCountRev + 1
+        }
+
+        if (targetToNegEdgeCount != 0) {
+            strengthTo <- targetToNegPathLength / (targetToNegEdgeCount * targetToNegEdgeCount)
+            sumNegative <- sumNegative + strengthTo
+            pureNegCount <- pureNegCount + 1
+
+            if (verbose) {
+                label <- if (targetToPosIsMixed) "Pure_Negative_From Target_to_Seed" else "Mixed_Negative_From_Target_to_Seed"
+                message(paste(
+                    label,
+                    paste("seed word:", negativeWords),
+                    paste("target word:", target),
+                    paste("path length:", targetToNegPathLength),
+                    paste("edge count:", targetToNegEdgeCount),
+                    paste("strength", strengthTo),
+                    paste("path string: [", targetToNegPathString, "]"),
+                    sep = ", "))
+            }
+        }
+
+        if (negToTargetEdgeCount != 0) {
+            strengthFrom <- negToTargetPathLength / (negToTargetEdgeCount * negToTargetEdgeCount)
+            sumNegative <- sumNegative + strengthFrom
+            pureNegCountRev <- pureNegCountRev + 1
+
+            if (verbose) {
+                label <- if (targetToPosIsMixed) "Pure_Negative_From Seed_to_Target" else "Mixed_Negative_From_Seed_to_Target"
+                message(paste(
+                    label,
+                    paste("seed word:", negativeWord),
+                    paste("target word:", target),
+                    paste("path length:", negToTargetPathLength),
+                    paste("edge count:", negToTargetEdgeCount),
+                    paste("strength", strengthFrom),
+                    paste("path string: [", negToTargetPathString, "]"),
+                    sep = ", "))
+            }
         }
     }
 
@@ -151,42 +229,62 @@ senti <- function(edgelist, target, positiveLexicon=system.file("extdata", "Seed
 
     s11 <- s5 -s4
 
-    out <- as.data.frame(cbind(s1, s2, s3, s4, s5, s6, s7, s8, s9,s10,s11))
-    colnames(out) <- c("S1.Number of positive words","S2.Number of negative words","S3.Positivity",
-    "S4.Negativity","S5.Normalized positivity","S6.Positivity/negativity ratio","S7.Positivity intensity",
-    "S8.Negativity intensity","S9.Normalized positivity intensity","S10.Normalized ratio of positivity intensity to negativity intensity",
-    "S11.Sentiment bias")
-    return(out)
+    result <- data.frame(
+        "senti_name" = c("S1.Number of positive words",
+                         "S2.Number of negative words",
+                         "S3.Positivity",
+                         "S4.Negativity",
+                         "S5.Normalized positivity",
+                         "S6.Positivity/negativity ratio",
+                         "S7.Positivity intensity",
+                         "S8.Negativity intensity",
+                         "S9.Normalized positivity intensity",
+                         "S10.Normalized ratio of positivity intensity to negativity intensity",
+                         "S11.Sentiment bias"),
+        "senti_value" = c(s1, s2, s3, s4, s5, s6, s7, s8, s9,s10,s11)
+    )
+
+    return(result)
 }
 
-calculateDistance <- function(graph, from, to, exclude) {
+calculateDistance <- function(graph, from, to, exclude, verbose) {
+    pathString <- ""
     allPaths <- igraph::all_shortest_paths(graph, from, to=to, mode="out")
 
     if (length(allPaths$res) == 0) {
-        return(c(0, 0, FALSE))
+        return(c(0, 0, FALSE, pathString))
     }
     for (path in allPaths$res) {
         pure <- TRUE
         lastIndex <- -1
+        lastWord <- ""
         d <- 0
-        length <- 0
+        count <- 0
+        pathString <- ""
         for (vertexIndex in path) {
             vertex <- V(graph)[vertexIndex]
             if (vertex$name %in% exclude) {
                 pure <- FALSE
-                break
             }
             if (lastIndex != -1) {
                 weight <- graph[lastIndex][vertexIndex][[1]]
                 d <- d + weight
-                length <- length + 1
+                count <- count + 1
+                currentPathString = paste(lastWord, vertex$name, weight)
+                pathString <- paste(pathString, currentPathString, sep=", ")
             }
             lastIndex <- vertexIndex
+            lastWord <- vertex$name
         }
         if (pure) {
-            return(c(d, length, FALSE))
+            return(c(d, count, FALSE, pathString))
         }
     }
 
-    return(c(0, 0, TRUE))
+    return(c(0, 0, TRUE, pathString))
 }
+
+setwd("/Users/beiyan/workspace/SenetTest")
+library(igraph)
+edgelist_myown <- read.csv("AppleNeg_wordij.csv")
+result<-senti(edgelist_myown,"iphone")
