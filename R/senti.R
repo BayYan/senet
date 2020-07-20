@@ -270,7 +270,11 @@ calculateDistance <- function(graph, from, to, exclude, verbose) {
                 weight <- graph[lastIndex][vertexIndex][[1]]
                 d <- d + weight
                 count <- count + 1
-                currentPathString = paste(lastWord, vertex$name, weight)
+                if (lastWord == "") {
+                    currentPathString = paste(vertex$name, weight)
+                } else {
+                    currentPathString = paste(lastWord, vertex$name, weight)
+                }
                 pathString <- paste(pathString, currentPathString, sep=", ")
             }
             lastIndex <- vertexIndex
