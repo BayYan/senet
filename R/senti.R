@@ -81,7 +81,8 @@ senti <- function(
                     paste("edge count:", targetToPosEdgeCount),
                     paste("strength ", strengthTo),
                     paste("path string: [", targetToPosPathString, "]"),
-                    sep = ", "))
+                    sep = ", "),
+                    appendLF = TRUE)
             }
         }
 
@@ -100,7 +101,8 @@ senti <- function(
                     paste("edge count:", posToTargetEdgeCount),
                     paste("strength", strengthFrom),
                     paste("path string: [", posToTargetPathString, "]"),
-                    sep = ", "))
+                    sep = ", "),
+                    appendLF = TRUE)
             }
         }
     }
@@ -149,7 +151,8 @@ senti <- function(
                     paste("edge count:", targetToNegEdgeCount),
                     paste("strength", strengthTo),
                     paste("path string: [", targetToNegPathString, "]"),
-                    sep = ", "))
+                    sep = ", "),
+                    appendLF = TRUE)
             }
         }
 
@@ -168,7 +171,8 @@ senti <- function(
                     paste("edge count:", negToTargetEdgeCount),
                     paste("strength", strengthFrom),
                     paste("path string: [", negToTargetPathString, "]"),
-                    sep = ", "))
+                    sep = ", "),
+                    appendLF = TRUE)
             }
         }
     }
@@ -287,8 +291,3 @@ calculateDistance <- function(graph, from, to, exclude, verbose) {
 
     return(c(0, 0, TRUE, pathString))
 }
-
-setwd("/Users/beiyan/workspace/SenetTest")
-library(igraph)
-edgelist_myown <- read.csv("AppleNeg_wordij.csv")
-result<-senti(edgelist_myown,"iphone")
