@@ -38,6 +38,8 @@ senti <- function(
     mixedNegCount = 0
     mixedNegCountRev = 0
 
+    verboseResult = data.frame(label=list(), seed=list(), target=list(), path_length=list(), edge_count=list(), strength=list(), paths=list())
+
 
     for (positiveWord in positiveWords) {
         posV <- igraph::V(graph)[name == positiveWord]
@@ -73,16 +75,26 @@ senti <- function(
 
             if (verbose) {
                 label <- if (targetToPosIsMixed) "Mixed_Positive_From_Target_to_Seed" else "Pure_Positive_From_Target_to_Seed"
-                message(paste(
-                    label,
-                    paste("seed word:", positiveWord),
-                    paste("target word:", target),
-                    paste("path length:", targetToPosPathLength),
-                    paste("edge count:", targetToPosEdgeCount),
-                    paste("strength ", strengthTo),
-                    paste("path string: [", targetToPosPathString, "]"),
-                    sep = ", "),
-                    appendLF = TRUE)
+                # message(paste(
+                #     label,
+                #     paste("seed word:", positiveWord),
+                #     paste("target word:", target),
+                #     paste("path length:", targetToPosPathLength),
+                #     paste("edge count:", targetToPosEdgeCount),
+                #     paste("strength ", strengthTo),
+                #     paste("path string: [", targetToPosPathString, "]"),
+                #     sep = ", "),
+                #     appendLF = TRUE)
+                currentResult = data.frame(
+                    label=label,
+                    seed=positiveWord,
+                    target=target,
+                    path_length=targetToPosPathLength,
+                    edge_count=targetToPosEdgeCount,
+                    strength=strengthTo,
+                    paths=targetToPosPathString
+                )
+                verboseResult = rbind(verboseResult, currentResult)
             }
         }
 
@@ -93,16 +105,26 @@ senti <- function(
 
             if (verbose) {
                 label <- if (targetToPosIsMixed) "Mixed_Positive_From_Seed_to_Target" else "Pure_Positive_From_Seed_to_Target"
-                message(paste(
-                    label,
-                    paste("seed word:", positiveWord),
-                    paste("target word:", target),
-                    paste("path length:", posToTargetPathLength),
-                    paste("edge count:", posToTargetEdgeCount),
-                    paste("strength", strengthFrom),
-                    paste("path string: [", posToTargetPathString, "]"),
-                    sep = ", "),
-                    appendLF = TRUE)
+                # message(paste(
+                #     label,
+                #     paste("seed word:", positiveWord),
+                #     paste("target word:", target),
+                #     paste("path length:", posToTargetPathLength),
+                #     paste("edge count:", posToTargetEdgeCount),
+                #     paste("strength", strengthFrom),
+                #     paste("path string: [", posToTargetPathString, "]"),
+                #     sep = ", "),
+                #     appendLF = TRUE)
+                currentResult = data.frame(
+                    label=label,
+                    seed=positiveWord,
+                    target=target,
+                    path_length=posToTargetPathLength,
+                    edge_count=posToTargetEdgeCount,
+                    strength=strengthFrom,
+                    paths=posToTargetPathString
+                )
+                verboseResult = rbind(verboseResult, currentResult)
             }
         }
     }
@@ -143,16 +165,26 @@ senti <- function(
 
             if (verbose) {
                 label <- if (targetToPosIsMixed) "Mixed_Negative_From Target_to_Seed" else "Pure_Negative_From_Target_to_Seed"
-                message(paste(
-                    label,
-                    paste("seed word:", negativeWords),
-                    paste("target word:", target),
-                    paste("path length:", targetToNegPathLength),
-                    paste("edge count:", targetToNegEdgeCount),
-                    paste("strength", strengthTo),
-                    paste("path string: [", targetToNegPathString, "]"),
-                    sep = ", "),
-                    appendLF = TRUE)
+                # message(paste(
+                #     label,
+                #     paste("seed word:", negativeWords),
+                #     paste("target word:", target),
+                #     paste("path length:", targetToNegPathLength),
+                #     paste("edge count:", targetToNegEdgeCount),
+                #     paste("strength", strengthTo),
+                #     paste("path string: [", targetToNegPathString, "]"),
+                #     sep = ", "),
+                #     appendLF = TRUE)
+                currentResult = data.frame(
+                    label=label,
+                    seed=negativeWord,
+                    target=target,
+                    path_length=targetToNegPathLength,
+                    edge_count=targetToNegEdgeCount,
+                    strength=strengthTo,
+                    paths=targetToNegPathString
+                )
+                verboseResult = rbind(verboseResult, currentResult)
             }
         }
 
@@ -163,16 +195,26 @@ senti <- function(
 
             if (verbose) {
                 label <- if (targetToPosIsMixed) "Mixed_Negative_From Seed_to_Target" else "Pure_Negative_From_Seed_to_Target"
-                message(paste(
-                    label,
-                    paste("seed word:", negativeWord),
-                    paste("target word:", target),
-                    paste("path length:", negToTargetPathLength),
-                    paste("edge count:", negToTargetEdgeCount),
-                    paste("strength", strengthFrom),
-                    paste("path string: [", negToTargetPathString, "]"),
-                    sep = ", "),
-                    appendLF = TRUE)
+                # message(paste(
+                #     label,
+                #     paste("seed word:", negativeWord),
+                #     paste("target word:", target),
+                #     paste("path length:", negToTargetPathLength),
+                #     paste("edge count:", negToTargetEdgeCount),
+                #     paste("strength", strengthFrom),
+                #     paste("path string: [", negToTargetPathString, "]"),
+                #     sep = ", "),
+                #     appendLF = TRUE)
+                currentResult = data.frame(
+                    label=label,
+                    seed=negativeWord,
+                    target=target,
+                    path_length=negToTargetPathLength,
+                    edge_count=negToTargetEdgeCount,
+                    strength=strengthFrom,
+                    paths=negToTargetPathString
+                )
+                verboseResult = rbind(verboseResult, currentResult)
             }
         }
     }
@@ -248,6 +290,10 @@ senti <- function(
         "senti_value" = c(s1, s2, s3, s4, s5, s6, s7, s8, s9,s10,s11)
     )
 
+    if (verbose) {
+        return(list(result, verboseResult))
+    }
+
     return(result)
 }
 
@@ -276,9 +322,9 @@ calculateDistance <- function(graph, from, to, exclude, verbose) {
                 count <- count + 1
                 currentPathString = paste(lastWord, vertex$name, weight)
                 if (pathString == "") {
-                    pathString <- paste(currentPathString, sep=", ")
+                    pathString <- paste(currentPathString, sep="; ")
                 } else {
-                    pathString <- paste(pathString, currentPathString, sep=", ")
+                    pathString <- paste(pathString, currentPathString, sep="; ")
                 }
             }
             lastIndex <- vertexIndex
